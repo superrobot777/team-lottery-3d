@@ -1,41 +1,31 @@
+<script setup>
+import TeamLottery3D from './components/TeamLottery3D.vue' 
+</script>
+
 <template>
-  <div id="app">
-    <!-- 加载 3D 抽奖场景组件 -->
-    <LotteryScene />
+  <!-- 根容器：确保占据整个视口 (h-screen) 并移除所有多余的标题 -->
+  <div id="app-container" class="w-full h-screen">
+    <TeamLottery3D class="w-full h-full" />
   </div>
 </template>
 
-<script setup>
-// 导入 3D 场景组件
-import LotteryScene from './components/LotteryScene.vue'
-</script>
-
 <style>
-/* ---------------------------------------------------
- * 全局样式：确保应用和 3D 场景能全屏显示
- * --------------------------------------------------- */
-
-/* 强制重置 body 样式，确保占满全屏且无默认边距 */
-body {
+/* 确保 HTML, body, 和 #app 元素从根部开始就占据整个视口 */
+html, body, #app {
   margin: 0;
   padding: 0;
-  overflow: hidden; /* 隐藏滚动条 */
-  background-color: #000; /* 黑色背景 */
-  font-family: 'Inter', sans-serif;
-  width: 100vw;
-  height: 100vh;
-  /* 关键：覆盖 Vite 默认可能存在的居中布局设置 */
-  display: block !important;
-  place-items: unset !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-}
-
-#app {
   width: 100%;
   height: 100%;
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
+  overflow: hidden; /* 确保没有滚动条 */
+  background-color: #0d0d0d; /* 设置整体暗色背景 */
+}
+
+/* 强制应用容器占据整个视口，修复只显示一半的问题 */
+#app-container {
+  position: fixed; 
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
 }
 </style>
