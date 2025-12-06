@@ -36,7 +36,7 @@
         <div v-if="resultNames.length > 0 && !showFinalResults" class="result-box">
           
           <!-- 此处揭晓奖项名称和奖品描述 -->
-          <div class="result-title">🎉 **{{ prizeTiers[currentPrizeIndex - 1].name }}** ({{ prizeTiers[currentPrizeIndex - 1].description }})  🎉</div>
+          <div class="result-title">🎉 **{{ prizeTiers[currentPrizeIndex - 1].name }}** ({{ prizeTiers[currentPrizeIndex - 1].description }}) 🎉</div>
           
           <div class="winners-list">
             <span v-for="name in resultNames" :key="name" class="winner-chip">{{ name }}</span>
@@ -52,13 +52,13 @@
       <!-- 最终结果展示表格 -->
       <Transition name="fade-scale">
         <div v-if="showFinalResults" class="final-results-box">
-            <div class="result-title">🏆 最终抽奖结果 🏆</div>
+            <div class="result-title">🏆 最终抽奖结果一览 🏆</div>
             
             <table class="results-table">
                 <thead>
                     <tr>
-                        <th>奖项 (奖品)</th> 
-                        <th>中奖人数</th>
+                        <!-- 标题修改：从 '奖项 (奖品)' 简化为 '奖品'，并删除了中奖人数列 -->
+                        <th>奖品</th> 
                         <th>中奖名单</th>
                     </tr>
                 </thead>
@@ -66,8 +66,10 @@
                     <!-- 循环遍历所有奖项 tier，并按 1等奖 -> 2等奖 -> 3等奖 顺序显示 -->
                     <tr v-for="prize in prizeTiers.slice().reverse()" :key="prize.name">
                         <!-- 显示奖项名称和奖品描述 -->
+                        <!-- 单元格内容：保持显示 “奖项名称 (奖品描述)” -->
                         <td>{{ prize.name }} ({{ prize.description }})</td>
-                        <td>{{ prize.drawn.value.length }} / {{ prize.count }}</td>
+                        
+                        <!-- 中奖名单列保持不变 -->
                         <td>
                             <span v-for="name in prize.drawn.value" :key="name" class="winner-chip final-chip">{{ name }}</span>
                             <span v-if="prize.drawn.value.length === 0">暂无</span>
@@ -102,21 +104,21 @@ import gsap from 'gsap';
 
 // --- 状态和数据 ---
 
-// 1. 团队成员名单 (10人)
+// 1. 团队成员名单 (10人) - 将 '张三' 替换为 '杲绍峰'
 const employees = [
   '杲绍峰', '苏昆', '王春祥', '刘东宇', '张衡',
   '梅东胜', '卓柏呈', '王超', '贾君慧', '王国强'
 ];
-// 锁定一等奖得主：张三
+// 锁定一等奖得主：杲绍峰
 const FORCED_WINNER_NAME = '杲绍峰'; 
 // 一等奖在 prizeTiers 数组中的索引（从0开始）
 const FIRST_PRIZE_INDEX = 2; 
 
 // 2. 奖项设置和顺序 (三等奖 -> 二等奖 -> 一等奖)
 const prizeTiers = [
-    { name: '三等奖', count: 3, description: '请大家喝咖啡', drawn: ref([]) }, 
-    { name: '二等奖', count: 2, description: '节假日公司加班3天', drawn: ref([]) }, 
-    { name: '一等奖', count: 1, description: '团队聚餐时买单一次', drawn: ref([]) }, 
+    { name: '三等奖', count: 3, description: '请大家喝杯咖啡', drawn: ref([]) }, 
+    { name: '二等奖', count: 2, description: '节假日免费加班1天', drawn: ref([]) }, 
+    { name: '一等奖', count: 1, description: '聚餐时自费买单1次', drawn: ref([]) }, 
 ];
 
 // 3. 抽奖状态和结果
@@ -271,31 +273,46 @@ const _executeLotterySequence = () => {
 
     const currentPrize = prizeTiers[currentPrizeIndex.value];
     let drawCount = currentPrize.count;
-    let candidates = remainingEmployees.value;
+    
+    // 1. 确定候选人池
+    let candidates = [...remainingEmployees.value]; // 复制一份所有剩余员工名单
+    
+    // 如果抽取的不是一等奖 (FIRST_PRIZE_INDEX = 2)，则排除锁定的一等奖得主 (杲绍峰)
+    if (currentPrizeIndex.value !== FIRST_PRIZE_INDEX) {
+        candidates = candidates.filter(name => name !== FORCED_WINNER_NAME);
+    }
+    // 现在 'candidates' 是用于随机抽取的正确名单。
 
     const winners = [];
     
-    // ** 强制中奖逻辑 **
+    // ** 2. 强制中奖逻辑 (针对一等奖) **
     if (currentPrizeIndex.value === FIRST_PRIZE_INDEX && currentPrize.count === 1) {
         // 1. 强制加入预定的一等奖得主
         winners.push(FORCED_WINNER_NAME);
         
-        // 2. 将该得主从剩余名单中移除
-        const forcedIndex = candidates.findIndex(name => name === FORCED_WINNER_NAME);
+        // 2. 将该得主从 *持久的* 剩余名单 (remainingEmployees.value) 中移除
+        const forcedIndex = remainingEmployees.value.findIndex(name => name === FORCED_WINNER_NAME);
         if (forcedIndex !== -1) {
-            candidates.splice(forcedIndex, 1);
+            remainingEmployees.value.splice(forcedIndex, 1);
         }
         
-        // 3. 减少需要随机抽取的数量（此时 drawCount 应该为 1，减为 0）
+        // 3. 减少需要随机抽取的数量
         drawCount--; 
     }
 
-    // 随机选择剩余的 N 位中奖者
+    // 3. 随机选择剩余的 N 位中奖者
     for (let i = 0; i < drawCount; i++) {
-        if (candidates.length === 0) break;
+        if (candidates.length === 0) break; // 如果候选人池空了
+        
         const randomIndex = Math.floor(Math.random() * candidates.length);
-        const winner = candidates.splice(randomIndex, 1)[0]; 
+        const winner = candidates.splice(randomIndex, 1)[0]; // 从候选人池中移除并选中
         winners.push(winner);
+        
+        // 4. 从 *持久的* 剩余名单 (remainingEmployees.value) 中移除这位中奖者
+        const originalIndex = remainingEmployees.value.findIndex(name => name === winner);
+        if (originalIndex !== -1) {
+            remainingEmployees.value.splice(originalIndex, 1);
+        }
     }
     
     // 如果没有抽取到中奖者 (比如名单抽完了)，则停止
