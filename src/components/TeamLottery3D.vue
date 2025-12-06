@@ -116,9 +116,9 @@ const FIRST_PRIZE_INDEX = 2;
 
 // 2. 奖项设置和顺序 (三等奖 -> 二等奖 -> 一等奖)
 const prizeTiers = [
-    { name: '三等奖', count: 3, description: '请大家喝杯咖啡', drawn: ref([]) }, 
-    { name: '二等奖', count: 2, description: '节假日免费加班1天', drawn: ref([]) }, 
-    { name: '一等奖', count: 1, description: '聚餐时自费买单1次', drawn: ref([]) }, 
+    { name: '三等奖', count: 3, description: '请每人喝杯咖啡', drawn: ref([]) }, 
+    { name: '二等奖', count: 2, description: '团队聚餐喝半斤白酒', drawn: ref([]) }, 
+    { name: '一等奖', count: 1, description: '为每人发666元红包', drawn: ref([]) }, 
 ];
 
 // 3. 抽奖状态和结果
