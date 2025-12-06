@@ -5,7 +5,7 @@
     <!-- 新增: 红色幕布介绍层 - 动画完成后 v-if="false" 移除，减少性能消耗 -->
     <div v-if="showIntro" class="intro-curtain-layer">
         <!-- 抽奖标题，在幕布之上 -->
-        <div class="intro-text">AU技术组抽奖</div>
+        <div class="intro-text">AU技术组聚餐抽奖</div>
         <!-- 左右两半幕布，使用 ref 控制 GSAP 动画 -->
         <div class="curtain left-curtain" ref="leftCurtain"></div>
         <div class="curtain right-curtain" ref="rightCurtain"></div>
@@ -116,9 +116,9 @@ const FIRST_PRIZE_INDEX = 2;
 
 // 2. 奖项设置和顺序 (三等奖 -> 二等奖 -> 一等奖)
 const prizeTiers = [
-    { name: '三等奖', count: 3, description: '请每人喝杯咖啡', drawn: ref([]) }, 
-    { name: '二等奖', count: 2, description: '团队聚餐喝半斤白酒', drawn: ref([]) }, 
-    { name: '一等奖', count: 1, description: '为每人发666元红包', drawn: ref([]) }, 
+    { name: '三等奖', count: 3, description: '喝三瓶啤酒', drawn: ref([]) }, 
+    { name: '二等奖', count: 2, description: '喝半斤白酒', drawn: ref([]) }, 
+    { name: '一等奖', count: 1, description: '为每人发66元红包', drawn: ref([]) }, 
 ];
 
 // 3. 抽奖状态和结果
